@@ -7,43 +7,43 @@ In both cases, random as well as streamd access, an object of type <code>GribFil
 
 <h2>Creating <code>GribFile</code> objects</h2>
 A <code>GribFile</code> object for random access to the data of the GRIB2 file is created and filled with data by using the following lines: 
-<p>
+<pre>
 <code>		
-    RandomAccessGribFile gribFile = new RandomAccessGribFile(datasetid, url);<br>
+    RandomAccessGribFile gribFile = new RandomAccessGribFile(datasetid, url);
     gribFile.importFromStream(inputstream, 0);
-</code>.
-</p>
+</code>
+</pre>
 Note that the <code>RandomAccessGribFile</code> loads the complete GRIB2 file into memory, which may be a limitation, depending on the number and size of GRIB2 files you want to process and the available memory. On the other hand, the <code>RandomAccessGribFile</code> offers arbitrary and location specific random access to the data contained in the GRIB2 file using the following function
-<p>
+<pre>
 <code>    
-    double longitude = ...   // in degrees<br>
-    double latitude = ...    // in degrees<br>
+    double longitude = ...   // in degrees
+    double latitude = ...    // in degrees
     float val = gribFile.getValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longiude));
-</code>,
-</p>
+</code>
+</pre>
 where longitude and latitude are the coordinates of the position whose data you want to obtain. Longitude and latitude can give an arbitrary position, if the position does not match a grid point, the value of the closest grid point is returned. If you need smoother data, the function
-<p>
+<pre>
 <code>    
-    double longitude = ...   // in degrees<br>
-    double latitude = ...    // in degrees<br>
+    double longitude = ...   // in degrees
+    double latitude = ...    // in degrees
     float val = gribFile.interpolateValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longiude));
 </code>
-</p>
+</pre>
 returns a two dimensional linear interpolated value at the position identified by longitude and latitude.
 
 If the <code>RandomAccessGribFile</code> cannot be used due to memory constraints, a <code>StreamedGribFile</code> can be used alternatively. A <code>RandomAccessGribFile</code> is instantiated and prepared for data access with the following lines:
-<p>
+<pre>
 <code>
-	StreamedGribFile gribFile = new StreamedGribFile(datasetid, url);<br>
+	StreamedGribFile gribFile = new StreamedGribFile(datasetid, url);
 	gribFile.prepareImportFromStream(openFile(inputstream, 0);
-</code>.
-</p>
+</code>
+</pre>
 These lines will load the full meta data of the GRIB2 file into memory and put it into Java classes, but it will not load the data section of the GRIB file. Instead, the data section will be read as a stream, which allows accessing the data of the GRIB2 file sequentially one by one using the function
-<p>
+<pre>
 <code>
     gribFile.float val = nextValue();
-</code>.
-</p>
+</code>
+</pre>
 Note, that since the data is streamed, no random access of the data for a specific location is possible. Instead, the first position has to be read from the meta data.
 
 The second parameter of the function <code>prepareImportFromStream</code> allows to define how many GRIB2 file structures should be skipped before data is accessed. This may be useful if there are several GRIB2 file structures contained in a single file or data stream.
@@ -58,38 +58,38 @@ The meta data of a GRIB2 file is contained in so-called templates:
 	<li>the Data Representation Template defines the representation of the data.</li>
 </ul>
 Each of these templates exist in different variants, which are identified by the Template Numbers. In order to obtain the correct template, the Template Number has to be considered. For each of the templates, uses the scheme illustrated below to obtain the correct template:
-<p>
+<pre>
 <code>
-	GridDefinitionTemplate3x gridDefinition = null;<br>
-	GribSection3 section3 = gribFile.getSection3();<br>	
-	if (section3.gridDefinitionTemplateNumber == 0)<br>
-		gridDefinition = (GridDefinitionTemplate30)section3.gridDefinitionTemplate;<br>
-	else {<br>
-		log.warning("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");<br>
-		// ...<br>
-	}<br>
-<br>
-	ProductDefinitionTemplate4x productDefinition = null;<br>
-	GribSection4 section4 = gribFile.getSection4();<br>
-	if (section4.productDefinitionTemplateNumber == 0)<br>
-		productDefinition = ((ProductDefinitionTemplate40)section4.productDefinitionTemplate;<br>
-    	else if (section4.productDefinitionTemplateNumber == 8)<br>
-		productDefinition = (ProductDefinitionTemplate48)section4.productDefinitionTemplate;<br>
-    	else {<br>
-		log.severe("Product Definition Template Number 4." + section4.productDefinitionTemplateNumber + " not implemented.");<br>
-		// ...<br>
-	}<br>
-<br>
-	DataRepresentationTemplate5x dataRepresentation = null;<br>
-	GribSection5 section5 = gribFile.getSection5(gridcnt);<br>
-	if (section5.dataRepresentationTemplateNumber == 0)<br>
-		dataRepresentation = ((DataRepresentationTemplate50)section5.dataRepresentationTemplate;<br>
-	else {<br>
-		log.severe("Data Representation Template Number 5." + section5.dataRepresentationTemplateNumber + " not implemented.");<br>
-		// ...<br>
-	}<br>
+	GridDefinitionTemplate3x gridDefinition = null;
+	GribSection3 section3 = gribFile.getSection3();
+	if (section3.gridDefinitionTemplateNumber == 0)
+		gridDefinition = (GridDefinitionTemplate30)section3.gridDefinitionTemplate;
+	else {
+		log.warning("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
+		// ...
+	}
+
+	ProductDefinitionTemplate4x productDefinition = null;
+	GribSection4 section4 = gribFile.getSection4();
+	if (section4.productDefinitionTemplateNumber == 0)
+		productDefinition = ((ProductDefinitionTemplate40)section4.productDefinitionTemplate;
+    	else if (section4.productDefinitionTemplateNumber == 8)
+		productDefinition = (ProductDefinitionTemplate48)section4.productDefinitionTemplate;
+    	else {
+		log.severe("Product Definition Template Number 4." + section4.productDefinitionTemplateNumber + " not implemented.");
+		// ...
+	}
+
+	DataRepresentationTemplate5x dataRepresentation = null;
+	GribSection5 section5 = gribFile.getSection5(gridcnt);
+	if (section5.dataRepresentationTemplateNumber == 0)
+		dataRepresentation = ((DataRepresentationTemplate50)section5.dataRepresentationTemplate;
+	else {
+		log.severe("Data Representation Template Number 5." + section5.dataRepresentationTemplateNumber + " not implemented.");
+		// ...
+	}
 </code>
-</p>
+</pre>
 From the templates, the meta data of the GRIB2 file can be accessed directly as the individual data fields of the templates.
 
 Note that the library does not fully cover the GRIB2 specification. If you feel that there are certain templates missing that should be supported by the library, please contact me or extend the lib on your own and send me a pull request.
