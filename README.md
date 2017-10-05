@@ -1,9 +1,11 @@
 # GRIB2Tools
 Tools for processing GRIB2 files
 
-GRIB2Tools is a library for processing GRIB2 files. GRIB2 files are usually used for storing and distributing data from weather forecasts. The library reads and decodes the meta data of the GRIB file and puts it into Java objects that are easily accessible. Furthermore, the library offers functionality for random access as well as streamed (i.e sequential) access to the data of the file.
+GRIB2Tools is a library for processing GRIB2 files. The library reads and decodes the meta data of the GRIB file and puts it into Java objects that are easily accessible. Furthermore, the library offers functionality for random access as well as streamed (i.e sequential) access to the data of the file.
 
 In both cases, random as well as streamd access, an object of type `GribFile` represents the GRIB2 file. This object contains all meta data of the GRIB2 file and provides access to the data of the GRIB2 file. An object of type `InputStream` is required, which delivers the data to the `GribFile`. The `InputStream` can be obtained from any source, for example from a file on the local PC, from a resource on a FTP server or from any URL. 
+
+The library is continuously used for processing weather forecast data from German authority Deutscher Wetterdienst (DWD).
 
 Creating `GribFile` objects
 ---------------------------
