@@ -27,25 +27,18 @@ public class GribSection implements Serializable {
 		sectiondata = data;
 	}
 	
-	//public GribSection(InputStream gribfile) {
 	public GribSection(InputStream gribfile) throws IOException {
 
-//		try {
 
-			// All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
-			// long length of the section, followed by a one byte section number (type)
-			byte[] sectionheader = new byte[5];
-			gribfile.read(sectionheader);		
-			ByteBuffer byteBuffer = ByteBuffer.wrap(sectionheader);
+		// All Sections of type 1 to 7 begin with a five byte long header. This header consists of a four byte
+		// long length of the section, followed by a one byte section number (type)
+		byte[] sectionheader = new byte[5];
+		gribfile.read(sectionheader);		
+		ByteBuffer byteBuffer = ByteBuffer.wrap(sectionheader);
 
-			// Extract section length and section number (type) from the header
-			sectionlength = byteBuffer.getInt();
-			sectionnumber = byteBuffer.get();
-/*
-		} catch (Exception e) {
-			ExceptionLogging.printExceptionEvent(e);
-		}
-*/					
+		// Extract section length and section number (type) from the header
+		sectionlength = byteBuffer.getInt();
+		sectionnumber = byteBuffer.get();
 	}
 	
 	public GribSection initSection() {
@@ -62,36 +55,20 @@ public class GribSection implements Serializable {
 		return null;
 	}
 		
-	//public void readData(InputStream gribfile) {
 	public void readData(InputStream gribfile) throws IOException {
 		
-//		try {
-
-			// Read complete section
-			sectiondata = new byte[sectionlength-5];
-			gribfile.read(sectiondata);
-/*		
-		} catch (Exception e) {
-			ExceptionLogging.printExceptionEvent(e);
-		}
-*/					
+		// Read complete section
+		sectiondata = new byte[sectionlength-5];
+		gribfile.read(sectiondata);
 	}
 	
-	//public void writeToStream(OutputStream gribFile) {
 	public void writeToStream(OutputStream gribFile) throws IOException {
 
 		DataOutputStream dataout = new DataOutputStream(gribFile);
 
-//		try {
-			
-			dataout.writeInt(sectionlength);
-			gribFile.write(sectionnumber);
-			gribFile.write(sectiondata);
-/*
-		} catch (Exception e) {
-			ExceptionLogging.printExceptionEvent(e);
-		}
-*/		
+		dataout.writeInt(sectionlength);
+		gribFile.write(sectionnumber);
+		gribFile.write(sectiondata);
 	}
 	
 	// Adjust a two byte value extracted from a GRIB file according to the GRIB specification to obtain

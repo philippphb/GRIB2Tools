@@ -21,7 +21,6 @@ public class RandomAccessGribFile extends GribFile {
 		super(typeid, source);
 	}
 
-	//public void importFromStream(InputStream gribfile, int numskip) {
 	public void importFromStream(InputStream gribfile, int numskip) throws IOException {
 					
 		if (gribfile == null) return;
@@ -90,22 +89,19 @@ public class RandomAccessGribFile extends GribFile {
 				// Calculate j index of the matrix containing the data the contains the data of the 
 				// passed latitude lat
 				int deltalat = lat - (gridDefinition.firstPointLat + deltaj);
-//int deltalat = lat - (gridDefinition.firstPointLat + 0);
 				int jidx = Math.round((float)deltalat / (float)gridDefinition.jDirectionIncrement);
-//int jidx = (int)Math.floor((float)deltalat / (float)gridDefinition.jDirectionIncrement);
+
 				// Calculate i index of the matrix containing the data the contains the data of the 
 				// passed longitude lon
 				int firstPointLon = gridDefinition.firstPointLon + 0;
 				if (firstPointLon >= GribFile.degToUnits(180)) firstPointLon -= GribFile.degToUnits(360);
 				int deltalon = lon - firstPointLon;
 				int iidx = Math.round((float)deltalon / (float)gridDefinition.iDirectionIncrement);
-//int iidx = (int)Math.floor((float)deltalon / (float)gridDefinition.iDirectionIncrement);
-//System.out.println("j: " + jidx + ", i: " + iidx);				
+
 				// Extract data belonging to the referred location and calculate the value represented by the data
 				byte data[] = sec7.sectiondata;
 				short unsignedraw = ByteBuffer.wrap(data).getShort((jidx*gridDefinition.numberPointsLon+iidx)*bytesperval);
 				val = sec5.calcValue(unsignedraw); 
-//System.out.println("lat: " + lat + "/" + jidx +", lon: " + lon + "/" + iidx);				
 			}
 			
 			else {
@@ -156,7 +152,7 @@ deltaj = 0;
 				// Find j indices of the grid points of the matrix containing the data that surround the
 				// passed latitude lat
 				int deltalat = lat - (gridDefinition.firstPointLat + deltaj);
-//				int jidx1 = Math.round((float)deltalat / (float)gridDefinition.jDirectionIncrement);
+				//int jidx1 = Math.round((float)deltalat / (float)gridDefinition.jDirectionIncrement);
 				int jidx1 = (int)Math.floor((float)deltalat / (float)gridDefinition.jDirectionIncrement);
 				
 				// Correct indices when end of the array dimension is reached
@@ -168,7 +164,7 @@ deltaj = 0;
 				int firstPointLon = gridDefinition.firstPointLon + 0;
 				if (firstPointLon >= GribFile.degToUnits(180)) firstPointLon -= GribFile.degToUnits(360);
 				int deltalon = lon - firstPointLon;
-//				int iidx1 = Math.round((float)deltalon / (float)gridDefinition.iDirectionIncrement);
+				//int iidx1 = Math.round((float)deltalon / (float)gridDefinition.iDirectionIncrement);
 				int iidx1 = (int)Math.floor((float)deltalon / (float)gridDefinition.iDirectionIncrement);
 
 				// Correct indices when end of the array dimension is reached

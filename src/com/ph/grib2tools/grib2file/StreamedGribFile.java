@@ -22,7 +22,6 @@ public class StreamedGribFile extends GribFile {
 		super(typeid, source);
 	}
 
-	//public boolean prepareImportFromStream(InputStream gribfile1, int numskip) {
 	public boolean prepareImportFromStream(InputStream gribfile1, int numskip) throws IOException {
 					
 		this.gribfile = gribfile1;
@@ -58,7 +57,6 @@ public class StreamedGribFile extends GribFile {
 
 	// Extracts the next data field from the streamed GRIB file and returns the value represented
 	// by the data
-	//public float nextValue() {
 	public float nextValue() throws IOException {
 	
 		int grididx = 0;
@@ -73,20 +71,13 @@ public class StreamedGribFile extends GribFile {
 			DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50)sec5.dataRepresentationTemplate;	
 			int bytesperval = dataRepresentation.numberBits / 8;
 			
-//			try {
-				
-				// Read data from data stream
-				byte data[] = new byte[bytesperval];
-				gribfile.read(data);
+			// Read data from data stream
+			byte data[] = new byte[bytesperval];
+			gribfile.read(data);
 
-				// Determine the value represented by the data
-				short unsignedraw = ByteBuffer.wrap(data).getShort();
-				val = sec5.calcValue(unsignedraw);
-/*			
-			} catch (Exception e) {
-				//ExceptionLogging.printExceptionEvent(e);
-			}
-*/			 
+			// Determine the value represented by the data
+			short unsignedraw = ByteBuffer.wrap(data).getShort();
+			val = sec5.calcValue(unsignedraw);
 		}
 		
 		else {
