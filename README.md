@@ -7,8 +7,8 @@ In both cases, random as well as streamd access, an object of type `GribFile` re
 
 The library is continuously used for processing weather forecast data from German authority Deutscher Wetterdienst (DWD).
 
-Creating `GribFile` objects
----------------------------
+Creating `GribFile` objects and Accessing Data
+----------------------------------------------
 
 A `GribFile` object for random access to the data of the GRIB2 file is created and filled with data by using the following lines: 
 
