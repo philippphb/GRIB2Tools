@@ -3,12 +3,12 @@ Tools for processing GRIB2 files
 
 GRIB2Tools is a library for processing GRIB2 files. The library reads and decodes the meta data of the GRIB file and puts it into Java objects that are easily accessible. Furthermore, the library offers functionality for random access as well as streamed (i.e sequential) access to the data of the file.
 
-In both cases, random as well as streamd access, an object of type `GribFile` represents the GRIB2 file. This object contains all meta data of the GRIB2 file and provides access to the data of the GRIB2 file. An object of type `InputStream` is required, which delivers the data to the `GribFile`. The `InputStream` can be obtained from any source, for example from a file on the local PC, from a resource on a FTP server or from any URL. 
+In both cases, random as well as streamed access, an object of type `GribFile` represents the GRIB2 file. This object contains all meta data of the GRIB2 file and provides access to the data of the GRIB2 file. An object of type `InputStream` is required, which delivers the data to the `GribFile`. The `InputStream` can be obtained from any source, for example from a file on the local PC, from a resource on a FTP server or from any URL. 
 
 The library is continuously used for processing weather forecast data from German authority Deutscher Wetterdienst (DWD).
 
-Creating `GribFile` objects and Accessing Data
-----------------------------------------------
+Random Data Access
+---------------------
 
 A `GribFile` object for random access to the data of the GRIB2 file is created and filled with data by using the following lines: 
 
@@ -35,7 +35,12 @@ where longitude and latitude are the coordinates of the position whose data you 
 
 returns a two dimensional linear interpolated value at the position identified by longitude and latitude.
 
-If the `RandomAccessGribFile` cannot be used due to memory constraints, a `StreamedGribFile` can be used alternatively. A `RandomAccessGribFile` is instantiated and prepared for data access with the following lines:
+Parameters `datasetid` and `url` are for identification of the GRIB2 file that is represented by the `GribFile` object and do not have any further effect on the behaviour of the class.
+
+Streamed Data Access
+----------------------
+
+Loading the complete GRIB2 file may not always be possible or desirable. In this case, a `StreamedGribFile` can be used instead of a `RandomAccessGribFile`. A `StreamedGribFile` is instantiated and prepared for data access with the following lines:
 
 ```
     StreamedGribFile gribFile = new StreamedGribFile(datasetid, url);
@@ -52,7 +57,7 @@ Note, that since the data is streamed, no random access of the data for a specif
 
 The second parameter of the function `prepareImportFromStream` allows to define how many GRIB2 file structures should be skipped before data is accessed. This may be useful if there are several GRIB2 file structures contained in a single file or data stream.
 
-The parameters `datasetid` and `url` are for identification of the GRIB2 file that is represented by the `GribFile` object and do not have any further effect on the behaviour of the class.
+Again, parameters `datasetid` and `url` are for identification of the GRIB2 file that is represented by the `GribFile` object and do not have any further effect on the behaviour of the class.
 
 Accessing the meta data of a GRIB2 file
 ---------------------------------------
