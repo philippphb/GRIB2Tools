@@ -9,8 +9,8 @@ public class GribSection6 extends GribSection {
 	private static final long serialVersionUID = 100L;
 
 	// Content and structure of a Section 6
-	protected byte bitMapIndicator;
-	protected byte[] bitMap;
+	public byte bitMapIndicator;
+	public byte[] bitMap;
 	
 	
 	public GribSection6(InputStream gribfile) throws IOException {

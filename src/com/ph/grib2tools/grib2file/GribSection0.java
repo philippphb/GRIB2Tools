@@ -15,8 +15,8 @@ public class GribSection0 implements Serializable {
 
 	// Content and structure of a Section 0
 	protected byte[] magicnumberbytes = new byte[4];
-	protected short reserved;
-	protected byte discipline;
+	public short reserved;
+	public byte discipline;
 	protected byte number;
 	protected long totalLength;
 	

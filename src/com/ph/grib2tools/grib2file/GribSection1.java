@@ -9,19 +9,19 @@ public class GribSection1 extends GribSection {
 	private static final long serialVersionUID = 100L;
 
 	// Content and structure of a Section 1
-	protected short generatingCentre;
-	protected short generatingSubcentre;
-	protected byte masterTablesVersion;
-	protected byte localTablesVersion;
-	protected byte significanceOfReferenceTime;
-	protected short year;
-	protected byte month;
-	protected byte day;
-	protected byte hour;
-	protected byte minute;
-	protected byte second;
-	protected byte productionStatus;
-	protected byte type;
+	public short generatingCentre;
+	public short generatingSubcentre;
+	public byte masterTablesVersion;
+	public byte localTablesVersion;
+	public byte significanceOfReferenceTime;
+	public short year;
+	public byte month;
+	public byte day;
+	public byte hour;
+	public byte minute;
+	public byte second;
+	public byte productionStatus;
+	public byte type;
 	
 
 	public GribSection1(InputStream gribfile) throws IOException {
