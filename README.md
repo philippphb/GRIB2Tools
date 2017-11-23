@@ -104,3 +104,7 @@ Each of these templates exist in different variants, which are identified by the
 From the templates, the meta data of the GRIB2 file can be accessed directly as the individual data fields of the templates.
 
 Note that the library does not fully cover the GRIB2 specification. If you feel that there are certain templates missing that should be supported by the library, please contact me or extend the lib on your own and send me a pull request.
+
+Demo Application
+----------------
+File `GRIB2FileTest.java`contains a small application. Together with the GRIB2 file in the `res` folder, a working demo is provided, which shows how to use the library.
