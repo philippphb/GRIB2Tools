@@ -22,7 +22,7 @@ Note that the `RandomAccessGribFile` loads the complete GRIB2 file into memory, 
 ```
     double longitude = ...   // in degrees
     double latitude = ...    // in degrees
-    float val = gribFile.getValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longiude));
+    float val = gribFile.getValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longitude));
 ```
 
 where longitude and latitude are the coordinates of the position whose data you want to obtain. Longitude and latitude can give an arbitrary position, if the position does not match a grid point, the value of the closest grid point is returned. If you need smoother data, the function
@@ -30,7 +30,7 @@ where longitude and latitude are the coordinates of the position whose data you 
 ```
     double longitude = ...   // in degrees
     double latitude = ...    // in degrees
-    float val = gribFile.interpolateValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longiude));
+    float val = gribFile.interpolateValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longitude));
 ```
 
 returns a two dimensional linear interpolated value at the position identified by longitude and latitude.
@@ -76,14 +76,14 @@ Each of these templates exist in different variants, which are identified by the
     if (section3.gridDefinitionTemplateNumber == 0)
         gridDefinition = (GridDefinitionTemplate30)section3.gridDefinitionTemplate;
     else {
-        log.warning("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
+        log.severe("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
         // ...
     }
 
     ProductDefinitionTemplate4x productDefinition = null;
     GribSection4 section4 = gribFile.getSection4();
     if (section4.productDefinitionTemplateNumber == 0)
-        productDefinition = ((ProductDefinitionTemplate40)section4.productDefinitionTemplate;
+        productDefinition = (ProductDefinitionTemplate40)section4.productDefinitionTemplate;
     else if (section4.productDefinitionTemplateNumber == 8)
         productDefinition = (ProductDefinitionTemplate48)section4.productDefinitionTemplate;
     else {
@@ -94,7 +94,7 @@ Each of these templates exist in different variants, which are identified by the
     DataRepresentationTemplate5x dataRepresentation = null;
     GribSection5 section5 = gribFile.getSection5(gridcnt);
     if (section5.dataRepresentationTemplateNumber == 0)
-        dataRepresentation = ((DataRepresentationTemplate50)section5.dataRepresentationTemplate;
+        dataRepresentation = (DataRepresentationTemplate50)section5.dataRepresentationTemplate;
     else {
         log.severe("Data Representation Template Number 5." + section5.dataRepresentationTemplateNumber + " not implemented.");
         // ...
