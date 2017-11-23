@@ -22,7 +22,7 @@ Note that the `RandomAccessGribFile` loads the complete GRIB2 file into memory, 
 ```
     double longitude = ...   // in degrees
     double latitude = ...    // in degrees
-    float val = gribFile.getValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longitude));
+    float val = gribFile.getValueAtLocation(grididx, latitude, longitude);
 ```
 
 where longitude and latitude are the coordinates of the position whose data you want to obtain. Longitude and latitude can give an arbitrary position, if the position does not match a grid point, the value of the closest grid point is returned. If you need smoother data, the function
@@ -30,7 +30,7 @@ where longitude and latitude are the coordinates of the position whose data you 
 ```
     double longitude = ...   // in degrees
     double latitude = ...    // in degrees
-    float val = gribFile.interpolateValueAt(grididx, GribFile.degToUnits(latitude), GribFile.degToUnits(longitude));
+    float val = gribFile.interpolateValueAtLocation(grididx, latitude, longitude);
 ```
 
 returns a two dimensional linear interpolated value at the position identified by longitude and latitude.
