@@ -3,8 +3,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.logging.Logger;
 
+import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate50;
+import com.ph.grib2tools.grib2file.datarepresentation.DataRepresentationTemplate5x;
 import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate30;
+import com.ph.grib2tools.grib2file.griddefinition.GridDefinitionTemplate3x;
+import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate40;
+import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate48;
+import com.ph.grib2tools.grib2file.productdefinition.ProductDefinitionTemplate4x;
 
 public abstract class GribFile implements Serializable {
 
@@ -36,7 +43,7 @@ public abstract class GribFile implements Serializable {
 	// Counter for multiple Sections 5, 6, 7
 	int gridcnt;
 
-//	private static final Logger log = Logger.getLogger(GribFile.class.getName());
+	private static final Logger log = Logger.getLogger(GribFile.class.getName());
 
 	
 	public GribFile(String typeid, String source) {
@@ -137,6 +144,50 @@ if (nextsection == null) break;
 
 	public String getType() { return typeid; }
 	public String getSource() {return source; }
+	
+	// Returns the GridDefinitionTemplate of the GRIB file according to the Template Number
+	public GridDefinitionTemplate3x getGridDefinitionTemplate() {
+		
+		GridDefinitionTemplate3x gridDefinition = null;
+		
+		if (section3.gridDefinitionTemplateNumber == 0)
+	        gridDefinition = (GridDefinitionTemplate30)section3.gridDefinitionTemplate;
+	    else {
+	        log.severe("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
+	    }	
+		
+		return gridDefinition;
+	}
+
+	// Returns the ProductDefinitionTemplate of the GRIB file according to the Template Number
+	public ProductDefinitionTemplate4x getProductDefinitionTemplate() {
+		
+		ProductDefinitionTemplate4x productDefinition = null;
+
+	    if (section4.productDefinitionTemplateNumber == 0)
+	        productDefinition = (ProductDefinitionTemplate40)section4.productDefinitionTemplate;
+	    else if (section4.productDefinitionTemplateNumber == 8)
+	        productDefinition = (ProductDefinitionTemplate48)section4.productDefinitionTemplate;
+	    else {
+	        log.severe("Product Definition Template Number 4." + section4.productDefinitionTemplateNumber + " not implemented.");
+	    }
+	    
+	    return productDefinition;
+	}
+	
+	// Returns the DataRepresentationTemplate of grid gridid of the GRIB file according to the Template Number
+	public DataRepresentationTemplate5x getDataRepresentationTemplate(int gridid) {
+		
+		DataRepresentationTemplate5x dataRepresentation = null;
+
+	    if (section5[gridid].dataRepresentationTemplateNumber == 0)
+	        dataRepresentation = (DataRepresentationTemplate50)section5[gridid].dataRepresentationTemplate;
+	    else {
+	        log.severe("Data Representation Template Number 5." + section5[gridid].dataRepresentationTemplateNumber + " not implemented.");
+	    }
+	    
+	    return dataRepresentation;
+	}
 	
 	public GribSection0 getSection0() { return section0; }
 	public GribSection1 getSection1() { return section1; }

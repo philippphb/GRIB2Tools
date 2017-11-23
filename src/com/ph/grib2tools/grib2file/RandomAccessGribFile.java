@@ -54,7 +54,15 @@ public class RandomAccessGribFile extends GribFile {
 		}		
 	}
 
-	// Extracts the data belonging to the passed coordinate (lat, lon) and returns the
+	// Extracts the data belonging to the passed coordinate (lat, lon) in degrees and returns the
+	// value represented by this data. If the passed coordinate is not a grid point of the
+	// data grid, the data belonging to the grid point closest to the passed position
+	// is considered. 
+	public float getValueAtLocation(int grididx, double lat, double lon) {
+		return getValueAt(grididx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
+	}
+	
+	// Extracts the data belonging to the passed coordinate (lat, lon) in units and returns the
 	// value represented by this data. If the passed coordinate is not a grid point of the
 	// data grid, the data belonging to the grid point closest to the passed position
 	// is considered. 
@@ -116,7 +124,15 @@ public class RandomAccessGribFile extends GribFile {
 		return val;
 	}
 
-	// Extracts the data belonging to the passed coordinate (lat, lon) and returns the
+	// Extracts the data belonging to the passed coordinate (lat, lon) in degrees and returns the
+	// value represented by this data. If the passed coordinate is not a grid point of the
+	// data grid, the data belonging to the neighbored grid points is interpolated and used
+	// to calculate the value belonging to the passed position.
+	public float interpolateValueAtLocation(int grididx, double lat, double lon) {
+		return interpolateValueAt(grididx, GribFile.degToUnits(lat), GribFile.degToUnits(lon));
+	}
+
+	// Extracts the data belonging to the passed coordinate (lat, lon) in units and returns the
 	// value represented by this data. If the passed coordinate is not a grid point of the
 	// data grid, the data belonging to the neighbored grid points is interpolated and used
 	// to calculate the value belonging to the passed position.
