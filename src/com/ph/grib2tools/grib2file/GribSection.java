@@ -70,13 +70,33 @@ public class GribSection implements Serializable {
 		gribFile.write(sectionnumber);
 		gribFile.write(sectiondata);
 	}
+   
+   // Adjust a one byte value extracted from a GRIB file according to the GRIB specification to obtain
+   // a correct unsigned byte
+   public static short adjustUnsignedByte(int unsignedbyte) {
+      return (short) ((unsignedbyte & 0x7F) + (unsignedbyte & 0x80));
+   }
 	
 	// Adjust a two byte value extracted from a GRIB file according to the GRIB specification to obtain
 	// a correct unsigned short
 	public static int adjustUnsignedShort(int unsignedshort) {
-		int unsignedint = (unsignedshort & 0x7FFF) + (unsignedshort & 0x8000);
-		return unsignedint;
+	   return (unsignedshort & 0x7FFF) + (unsignedshort & 0x8000);
 	}
+
+   // Adjust a four byte value extracted from a GRIB file according to the GRIB specification to obtain
+   // a correct unsigned int
+   public static long adjustUnsignedInt(int unsignedint) {
+      return (unsignedint & 0x7FFFFFFF) + (unsignedint & 0x80000000L);
+   }
+   
+   // Convert a one byte value extracted from a GRIB file according to the GRIB specification to recover
+   // the sign of a signed one
+   public static byte correctNegativeByte(byte uncorrectedvalue) {
+      byte correctedvalue = (byte)(uncorrectedvalue & 0x7f);
+      if ((uncorrectedvalue & 0x80) == 0x80) correctedvalue = (byte) -correctedvalue;
+      assert uncorrectedvalue<0x80 || uncorrectedvalue != correctedvalue;
+      return correctedvalue;
+   }
 	
 	// Convert a two byte value extracted from a GRIB file according to the GRIB specification to recover
 	// the sign of a signed short
@@ -90,7 +110,7 @@ public class GribSection implements Serializable {
 	// the sign of a signed int
 	public static int correctNegativeInt(int uncorrectedvalue) {
 		int correctedvalue = uncorrectedvalue & 0x7fffffff;
-		if ((uncorrectedvalue & 0x80000000) == 0x80000000) correctedvalue = -correctedvalue;
+		if ((uncorrectedvalue & 0x80000000L) == 0x80000000L) correctedvalue = -correctedvalue;
 		return correctedvalue;
 	}
 }

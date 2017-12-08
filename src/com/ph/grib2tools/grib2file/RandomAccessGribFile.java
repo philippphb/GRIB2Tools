@@ -41,6 +41,7 @@ public class RandomAccessGribFile extends GribFile {
 				GribSection nextsection = new GribSection(gribfile).initSection();
 				if (nextsection.sectionnumber == 7) {
 					section7[gridcnt] = (GribSection7)nextsection;
+					section7[gridcnt].setDataRepresentation(section5[gridcnt].numberDataPoints, section5[gridcnt].dataRepresentationTemplate);
 					section7[gridcnt].readData(gribfile);
 					gridcnt++;
 				}
