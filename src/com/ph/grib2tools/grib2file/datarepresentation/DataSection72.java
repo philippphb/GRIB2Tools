@@ -8,7 +8,6 @@ public class DataSection72 extends DataSection7x {
 	
 	private static final long serialVersionUID = 100L;
 	
-	private DataRepresentationTemplate52 representation;
    // 6-xx              NG group reference values (XI in the decoding formula), each of which is encoded using the number of bits specified in octet 20 of Data Representation Template 5.0. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary.
 	public int[] groupRefValues;
    // [xx+1]-yy         NG group widths, each of which is encoded using the number of bits specified in octet 37 of Data Representation Template 5.2. Bits set to zero shall be appended as necessary to ensure this sequence of numbers ends on an octet boundary.
