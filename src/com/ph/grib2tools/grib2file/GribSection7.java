@@ -14,7 +14,7 @@ import com.ph.grib2tools.grib2file.datarepresentation.DataSection7x;
 
 public class GribSection7 extends GribSection {	
 	
-	private static final long serialVersionUID = 100L;
+	private static final long serialVersionUID = 200L;
 	
 	private int numberDataPoints;
 	private DataRepresentationTemplate5x dataRepresentation;
