@@ -23,10 +23,12 @@ public abstract class GribFile implements Serializable {
 	// Conversation factor for converting GRIB file units to degree (for coordinates)
 	public static int GRIB2DEGUNIT = 1000000;
 
-	//
+	// A string for identifying the data set. For information only, so can
+	// be "" or null if not needed.
 	protected String typeid;
 	
-	//
+	// A string pointing to the source of the GRIB2 data. For information only,
+	// so can be "" or null if not needed
 	protected String source;
 	
 	// Sections of the GRIB file
@@ -41,7 +43,7 @@ public abstract class GribFile implements Serializable {
 	protected GribSection8 section8;
 
 	// Counter for multiple Sections 5, 6, 7
-	int gridcnt;
+	protected int gridcnt;
 
 	private static final Logger log = Logger.getLogger(GribFile.class.getName());
 
@@ -144,6 +146,7 @@ if (nextsection == null) break;
 
 	public String getType() { return typeid; }
 	public String getSource() {return source; }
+	public int getGridCount() { return gridcnt; }
 	
 	// Returns the GridDefinitionTemplate of the GRIB file according to the Template Number
 	public GridDefinitionTemplate3x getGridDefinitionTemplate() {
