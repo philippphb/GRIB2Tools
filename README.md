@@ -50,7 +50,7 @@ Loading the complete GRIB2 file may not always be possible or desirable. In this
 These lines will load the full meta data of the GRIB2 file into memory and put it into Java classes, but it will not load the data section of the GRIB file. Instead, the data section will be read as a stream, which allows accessing the data of the GRIB2 file sequentially one by one using the function
 
 ```
-    gribFile.float val = nextValue();
+    float val = gribFile.nextValue();
 ```
 
 Note, that since the data is streamed, no random access of the data for a specific location is possible. Instead, the first position has to be read from the meta data.
