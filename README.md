@@ -101,7 +101,12 @@ Each of these templates exist in different variants, which are identified by the
     }
 ```
 
-From the templates, the meta data of the GRIB2 file can be accessed directly as the individual data fields of the templates.
+From the templates, the meta data of the GRIB2 file can be accessed directly as the individual data fields of the templates. For example, category and number of the product can be accessed from the Product Definition as follows:
+
+```
+    byte paramCategory = productDefinition.parameterCategory;
+    byte paramNumber = productDefinition.parameterNumber;
+```
 
 Note that the library does not fully cover the GRIB2 specification. If you feel that there are certain templates missing that should be supported by the library, please contact me or extend the lib and send me a pull request.
 
