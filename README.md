@@ -5,7 +5,7 @@ GRIB2Tools is a library for processing GRIB2 files. The library reads and decode
 
 In both cases, random as well as streamed access, an object of type `GribFile` represents the GRIB2 file. This object contains all meta data of the GRIB2 file and provides access to the data of the GRIB2 file. An object of type `InputStream` is required, which delivers the data to the `GribFile`. The `InputStream` can be obtained from any source, for example from a file on the local PC, from a resource on a FTP server or from any URL. 
 
-In its current state the library can be used for processing weather forecast data from the ICON model of German authority Deutscher Wetterdienst (DWD) and from NOAA's GFS publications.
+In its current state the library can is used for constantly processing weather forecast data from the ICON model of German authority Deutscher Wetterdienst (DWD) and from NOAA's GFS publications. See https://theweatherserver.com for a working demo.
 
 Random Data Access
 ---------------------
@@ -50,7 +50,7 @@ Loading the complete GRIB2 file may not always be possible or desirable. In this
 These lines will load the full meta data of the GRIB2 file into memory and put it into Java classes, but it will not load the data section of the GRIB file. Instead, the data section will be read as a stream, which allows accessing the data of the GRIB2 file sequentially one by one using the function
 
 ```
-    gribFile.float val = nextValue();
+    float val = gribFile.nextValue();
 ```
 
 Note, that since the data is streamed, no random access of the data for a specific location is possible. Instead, the first position has to be read from the meta data.
