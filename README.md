@@ -5,7 +5,7 @@ GRIB2Tools is a library for processing GRIB2 files. The library reads and decode
 
 In both cases, random as well as streamed access, an object of type `GribFile` represents the GRIB2 file. This object contains all meta data of the GRIB2 file and provides access to the data of the GRIB2 file. An object of type `InputStream` is required, which delivers the data to the `GribFile`. The `InputStream` can be obtained from any source, for example from a file on the local PC, from a resource on a FTP server or from any URL. 
 
-In its current state the library can is used for constantly processing weather forecast data from the ICON model of German authority Deutscher Wetterdienst (DWD) and from NOAA's GFS publications. See https://theweatherserver.com for a working demo.
+In its current state the library can is used for constantly processing weather forecast data from the ICON model of German authority Deutscher Wetterdienst (DWD) and from NOAA's GFS publications. See https://theweatherserver.com and https://ocean.guide for a working demo.
 
 Random Data Access
 ---------------------
