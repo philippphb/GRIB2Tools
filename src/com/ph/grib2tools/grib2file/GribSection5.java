@@ -14,8 +14,10 @@ public class GribSection5 extends GribSection {
 	private static final long serialVersionUID = 100L;
 
 	// Content and structure of a Section 5
+	@Deprecated
 	protected int numberDataPoints;
-	protected short dataRepresentationTemplateNumber;
+	protected int numberValues;
+	public short dataRepresentationTemplateNumber;
 	public DataRepresentationTemplate5x dataRepresentationTemplate;
 	
 	
@@ -38,7 +40,8 @@ public class GribSection5 extends GribSection {
 		ByteBuffer byteBuffer = ByteBuffer.wrap(sectiondata);
 
 		// Parse section and extract data
-		numberDataPoints = byteBuffer.getInt();
+		numberValues = byteBuffer.getInt();
+		numberDataPoints = numberValues;	// For downward compatibility
 		dataRepresentationTemplateNumber = byteBuffer.getShort();
 		
 		if (dataRepresentationTemplateNumber == 0) dataRepresentationTemplate = new DataRepresentationTemplate50(byteBuffer);
@@ -47,8 +50,11 @@ public class GribSection5 extends GribSection {
 		else System.out.println("Data Representation Template Number 5." + dataRepresentationTemplateNumber + " not implemented.");
 	}
 	
+	@Deprecated
 	public int getNumDataPoints(){ return numberDataPoints; }
-	
+
+	public int getNumValues(){ return numberValues; }
+
 	public float calcValue(short unsignedraw) {
 	
 		// Calculate value according to the GRIB specification 
