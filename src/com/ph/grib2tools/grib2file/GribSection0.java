@@ -27,7 +27,20 @@ public class GribSection0 implements Serializable {
 
 			// Read complete section
 			byte[] section0 = new byte[16];
+/*
 			gribfile.read(section0);		
+*/
+			byte[] b = new byte[1];
+
+			gribfile.read(b);
+			while(b[0] != 71) gribfile.read(b);
+			
+			section0[0] = b[0];
+			for (int i=1; i<16; i++) {
+				gribfile.read(b);
+				section0[i] = b[0];
+			}
+
 			ByteBuffer byteBuffer = ByteBuffer.wrap(section0);
 
 			// Parse section and extract data
