@@ -213,16 +213,43 @@ if (nextsection == null) break;
 	public void setSection8(GribSection8 section8) { this.section8 = section8; }
 
 	public static int getLatIndex(GridDefinitionTemplate30 gridDefinition, double latitude) {
-		return (GribFile.degToUnits(latitude) - gridDefinition.firstPointLat) / gridDefinition.jDirectionIncrement;
+		
+		int idx;
+		
+		int latTicks = GribFile.degToUnits(latitude);
+
+		if (gridDefinition.getDirectionJ() == 1) {
+			while (latTicks < gridDefinition.firstPointLat) latTicks += GribFile.degToUnits(180);
+			while (latTicks > gridDefinition.lastPointLat) latTicks -= GribFile.degToUnits(180);
+			idx = (latTicks - gridDefinition.firstPointLat) / gridDefinition.jDirectionIncrement;
+		}
+		else {
+			while (latTicks > gridDefinition.firstPointLat) latTicks -= GribFile.degToUnits(180);
+			while (latTicks < gridDefinition.lastPointLat) latTicks += GribFile.degToUnits(180);
+			idx = (gridDefinition.firstPointLat - latTicks) / gridDefinition.jDirectionIncrement;
+		}
+		
+		return idx;
 	}
 
 	public static int getLonIndex(GridDefinitionTemplate30 gridDefinition, double longitude) {
-
-		// Make sure that longitude is in a range from -180 to 180 degrees  
-		int firstPointLon = gridDefinition.firstPointLon;
-		if (firstPointLon >= GribFile.degToUnits(180)) firstPointLon -= GribFile.degToUnits(360);
 		
-		return (GribFile.degToUnits(longitude) - firstPointLon) / gridDefinition.iDirectionIncrement;
+		int idx;
+
+		int lonTicks = GribFile.degToUnits(longitude);
+		
+		if (gridDefinition.getDirectionI() == 1) {
+			while (lonTicks < gridDefinition.firstPointLon) lonTicks += GribFile.degToUnits(360);
+			while (lonTicks > gridDefinition.lastPointLon) lonTicks -= GribFile.degToUnits(360);
+			idx = (lonTicks - gridDefinition.firstPointLon) / gridDefinition.iDirectionIncrement;
+		}
+		else {
+			while (lonTicks > gridDefinition.firstPointLon) lonTicks -= GribFile.degToUnits(360);
+			while (lonTicks < gridDefinition.lastPointLon) lonTicks += GribFile.degToUnits(360);
+			idx = (gridDefinition.firstPointLon - lonTicks) / gridDefinition.iDirectionIncrement;
+		}
+
+		return idx;
 	}
 
 	public static long getVersion() { return serialVersionUID; }
