@@ -113,3 +113,9 @@ Note that the library does not fully cover the GRIB2 specification. If you feel 
 Demo Application
 ----------------
 File `GRIB2FileTest.java`contains a small application. Together with the GRIB2 file in the `res` folder, a working demo is provided, which shows how to use the library.
+
+Change Log
+----------
+* 24.10.2012
+   * Deprecated field `numberDataPoints` and method `public int getNumDataPoints()` of class `GribSection5`. Field and method are replaced by field `numberValues` and method `public int getNumValues()`. respectively. Reason for the change is better alignmnt with field naming of the GRIB2 standard.
+   * Added support of sparse data grids, that use a Section 6 bit map to identify which grid points contain a value and which not. `GribSection7` now contains a byte array `bitmapDecodedData`that contains all data of the full data grid. Note: Missing values are currently replaced by a zero, which will be changed soon, as this is not practical in the general case.  
