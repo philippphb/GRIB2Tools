@@ -41,7 +41,8 @@ public class RandomAccessGribFile extends GribFile {
 				GribSection nextsection = new GribSection(gribfile).initSection();
 				if (nextsection.sectionnumber == 7) {
 					section7[gridcnt] = (GribSection7)nextsection;
-					section7[gridcnt].setDataRepresentation(section5[gridcnt].numberDataPoints, section5[gridcnt].dataRepresentationTemplate);
+					//section7[gridcnt].setDataRepresentation(section5[gridcnt].numberDataPoints, section5[gridcnt].dataRepresentationTemplate);
+					section7[gridcnt].setDataRepresentation(section5[gridcnt].numberValues, section5[gridcnt].dataRepresentationTemplate);
 					section7[gridcnt].readData(gribfile);
 					
 					// Decode bit map to expand sparse data grid to full data grid
@@ -93,7 +94,7 @@ public class RandomAccessGribFile extends GribFile {
 						// Grid point without value, here we set this to zero. Depending on the data, this is
 						// not the best value. Maybe value for empty grid pos should be made configurable
 						if ((bitmapByte & (1 << bitmapBitPos)) == 0) rawValue = 0;
-						//if ((bitmapByte & (1 << (8-bitmapBitPos))) == 0) rawValue = 0;
+//						if ((bitmapByte & (1 << (8-bitmapBitPos))) == 0) rawValue = 0;
 						
 						// Grid point with value
 						else {
@@ -106,18 +107,71 @@ public class RandomAccessGribFile extends GribFile {
 							int valstartbit = sourcebitpos % 8;
 
 							// Retrieve value from value array
-							ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 2);
-							rawValue = byteBuffer.getShort();
-							rawValue = (short) (rawValue << valstartbit);
-							rawValue = (short) (rawValue >> (16-numbits));
+							if (numbits <= 8) {
+
+								// Get data from values array
+								ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 1);
+								rawValue = byteBuffer.get();
+
+								// Adjust for correct position in bit stream
+								rawValue = (byte) (rawValue >> (8-numbits-valstartbit));
+								rawValue = (byte) (rawValue & (0xff >> (8-numbits)));
+							}
+							else {
+
+								// Get data from values array
+								ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 2);
+								rawValue = byteBuffer.getShort();
+
+								// Adjust for correct position in bit stream
+								rawValue = (short) (rawValue >> (16-numbits-valstartbit));
+								rawValue = (short) (rawValue & (0xffff >> (16-numbits)));
+							}
 
 							// Increase the index of the next value in the value array of Section 7
 							sourcevaluecnt++;
 						}
 
-						// Write value in the ful grid data array
-						decodedGridData[bitmapIdx*2] = (byte) (rawValue >> 8);
-						decodedGridData[bitmapIdx*2+1] = (byte) (rawValue & 0xFF);
+						
+						// Position of the value in the array of values of Section 7
+						int targetbitpos = bitmapIdx * numbits;
+
+						// Position of byte and bit of the value array 
+						int targetstartbyte = (int)Math.floor(targetbitpos/8);
+						int targetstartbit = targetbitpos % 8;
+
+						// Write value in the full grid data array
+						if (numbits <= 8) {
+
+							// Create bit mask of length numbits shifted to have the alignment of
+							// the data in the bit stream
+							byte mask = (byte)(0xff >> (8-numbits));
+							mask = (byte)(mask << (8-numbits-targetstartbit));
+							
+							// Blend data into right position of the existing data stream 
+							ByteBuffer byteBuffer = ByteBuffer.wrap(decodedGridData, targetstartbyte, 1);
+							byte curData = byteBuffer.get();
+							byte data = (byte)(curData & (~mask));
+							data = (byte)(data | (rawValue  << (8-numbits-targetstartbit)));
+
+							decodedGridData[targetstartbyte] = data;
+						}
+						else {
+
+							// Create bit mask of length numbits shifted to have the alignment of
+							// the data in the bit stream
+							short mask = (short)(0xffff >> (16-numbits));
+							mask = (short)(mask << (16-numbits-targetstartbit));
+							
+							// Blend data into right position of the existing data stream 
+							ByteBuffer byteBuffer = ByteBuffer.wrap(decodedGridData, targetstartbyte, 2);
+							short curData = byteBuffer.getShort();
+							short data = (short)(curData & (~mask));
+							data = (short)(data | (rawValue  << (16-numbits-targetstartbit)));
+
+							decodedGridData[targetstartbyte] = (byte) (data >> 8);
+							decodedGridData[targetstartbyte+1] = (byte) (data & 0xFF);							
+						}
 					}
 				}
 			}	
@@ -149,10 +203,7 @@ public class RandomAccessGribFile extends GribFile {
 				
 		float val = 0;
 		
-		if (sec5.dataRepresentationTemplateNumber == 0) {
-
-			DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50)sec5.dataRepresentationTemplate;	
-			int bytesperval = dataRepresentation.numberBits / 8;
+//		if (sec5.dataRepresentationTemplateNumber == 0) {
 
 			if (section3.gridDefinitionTemplateNumber == 0) {
 	
@@ -188,21 +239,20 @@ public class RandomAccessGribFile extends GribFile {
 				int iidx = Math.round((float)deltalon / (float)gridDefinition.getStepI());
 
 				// Extract data belonging to the referred location and calculate the value represented by the data
-				//byte data[] = sec7.sectiondata;
 				byte data[] = sec7.bitmapDecodedData;
-				short unsignedraw = ByteBuffer.wrap(data).getShort((jidx*gridDefinition.numberPointsLon+iidx)*bytesperval);
-				val = sec5.calcValue(unsignedraw); 
+				val = sec5.calcValue(data, jidx*gridDefinition.numberPointsLon+iidx);
 			}
 			
 			else {
 				log.warning("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
 			}
+/*
 		}
 		
 		else {
 			log.warning("Data Representation Template Number 5." + sec5.dataRepresentationTemplateNumber + " not implemented.");
 		}
-		
+*/		
 		return val;
 	}
 
@@ -225,10 +275,7 @@ public class RandomAccessGribFile extends GribFile {
 		
 		float val = 0;
 		
-		if (sec5.dataRepresentationTemplateNumber == 0) {
-
-			DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50)sec5.dataRepresentationTemplate;	
-			int bytesperval = dataRepresentation.numberBits / 8;
+//		if (sec5.dataRepresentationTemplateNumber == 0) {
 
 			if (section3.gridDefinitionTemplateNumber == 0) {
 	
@@ -279,11 +326,11 @@ deltaj = 0;
 
 				// Extract data of the four grid points surrounding the passed coordinate and calculate the
 				// values represented by the data
-				float val11 = sec5.calcValue(ByteBuffer.wrap(data).getShort((jidx1*gridDefinition.numberPointsLon+iidx1)*bytesperval));
-				float val12 = sec5.calcValue(ByteBuffer.wrap(data).getShort((jidx1*gridDefinition.numberPointsLon+iidx2)*bytesperval)); 
+				float val11 = sec5.calcValue(data, jidx1*gridDefinition.numberPointsLon+iidx1);
+				float val12 = sec5.calcValue(data, jidx1*gridDefinition.numberPointsLon+iidx2); 
 				
-				float val21 = sec5.calcValue(ByteBuffer.wrap(data).getShort((jidx2*gridDefinition.numberPointsLon+iidx1)*bytesperval));
-				float val22 = sec5.calcValue(ByteBuffer.wrap(data).getShort((jidx2*gridDefinition.numberPointsLon+iidx2)*bytesperval)); 
+				float val21 = sec5.calcValue(data, jidx2*gridDefinition.numberPointsLon+iidx1);
+				float val22 = sec5.calcValue(data, jidx2*gridDefinition.numberPointsLon+iidx2); 
 
 				
 				// Find latitudes of the grid points of the matrix containing the data that surround the
@@ -307,12 +354,13 @@ deltaj = 0;
 			else {
 				log.warning("Grid Definition Template Number 3." + section3.gridDefinitionTemplateNumber + " not implemented.");
 			}
+/*			
 		}
-		
+
 		else {
 			log.warning("Data Representation Template Number 5." + sec5.dataRepresentationTemplateNumber + " not implemented.");
 		}
-
+*/
 		return val;
 	}
 }
