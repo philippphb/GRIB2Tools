@@ -121,3 +121,5 @@ Change Log
    * Added support of sparse data grids, that use a Section 6 bit map to identify which grid points contain a value and which not. `GribSection7` now contains a byte array `bitmapDecodedData`that contains all data of the full data grid. Note: Missing values are currently replaced by a zero, which will be changed soon, as this is not practical in the general case.  
 * October 25th, 2021
    * Updated jar file for changes of October 24th
+* October 27th, 2021
+   * Fixed bugs in support of sparse data grids and supported handling of arbitrary number of bits per value
