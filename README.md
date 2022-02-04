@@ -123,3 +123,5 @@ Change Log
    * Updated jar file for changes of October 24th
 * October 27th, 2021
    * Fixed bugs in support of sparse data grids and supported handling of arbitrary number of bits per value
+* February 4th, 2022
+   * Fix bugs in access of sparse data grid points in correct order and in processing data values with arbitrary bit lengths 
