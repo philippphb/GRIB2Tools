@@ -219,13 +219,9 @@ if (nextsection == null) break;
 		int latTicks = GribFile.degToUnits(latitude);
 
 		if (gridDefinition.getDirectionJ() == 1) {
-			while (latTicks < gridDefinition.firstPointLat) latTicks += GribFile.degToUnits(180);
-			while (latTicks > gridDefinition.lastPointLat) latTicks -= GribFile.degToUnits(180);
 			idx = (latTicks - gridDefinition.firstPointLat) / gridDefinition.jDirectionIncrement;
 		}
 		else {
-			while (latTicks > gridDefinition.firstPointLat) latTicks -= GribFile.degToUnits(180);
-			while (latTicks < gridDefinition.lastPointLat) latTicks += GribFile.degToUnits(180);
 			idx = (gridDefinition.firstPointLat - latTicks) / gridDefinition.jDirectionIncrement;
 		}
 		

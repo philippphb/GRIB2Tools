@@ -68,6 +68,7 @@ public class RandomAccessGribFile extends GribFile {
 			GridDefinitionTemplate30 gridDefinition = (GridDefinitionTemplate30) this.getGridDefinitionTemplate();
 			DataRepresentationTemplate50 dataRepresentation = (DataRepresentationTemplate50) this.getDataRepresentationTemplate(gridcnt);		
 			int numbits = dataRepresentation.numberBits;
+			int baseMask = (int)(Math.pow(2, numbits) - 1); 
 
 			byte valuesArray[] = section7[gridcnt].sectiondata;
 			byte decodedGridData[] = new byte[gridDefinition.numberPointsLat*gridDefinition.numberPointsLon*2];
@@ -89,12 +90,11 @@ public class RandomAccessGribFile extends GribFile {
 						int bitmapBitPos = bitmapIdx % 8;
 						byte bitmapByte = section6[gridcnt].bitMap[bitmapBytePos];
 
-						short rawValue;
+						int rawValue;
 						
 						// Grid point without value, here we set this to zero. Depending on the data, this is
 						// not the best value. Maybe value for empty grid pos should be made configurable
-						if ((bitmapByte & (1 << bitmapBitPos)) == 0) rawValue = 0;
-//						if ((bitmapByte & (1 << (8-bitmapBitPos))) == 0) rawValue = 0;
+						if ((bitmapByte & (1 << (7-bitmapBitPos))) == 0) rawValue = 0;
 						
 						// Grid point with value
 						else {
@@ -109,23 +109,47 @@ public class RandomAccessGribFile extends GribFile {
 							// Retrieve value from value array
 							if (numbits <= 8) {
 
-								// Get data from values array
-								ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 1);
-								rawValue = byteBuffer.get();
+								// Adapt value array access to align to array end
+								int readstartbyte;
+								int rawValueBitLength;
+								if (valstartbyte < valuesArray.length-2) {
+									readstartbyte = valstartbyte;
+									rawValueBitLength = 16;
+								}
+								else {
+									readstartbyte = valuesArray.length-2;
+									rawValueBitLength = 16 + ((valuesArray.length-2) - valstartbyte) * 8;
+								}
 
-								// Adjust for correct position in bit stream
-								rawValue = (byte) (rawValue >> (8-numbits-valstartbit));
-								rawValue = (byte) (rawValue & (0xff >> (8-numbits)));
-							}
-							else {
-
 								// Get data from values array
-								ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 2);
+								ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, readstartbyte, 2);
 								rawValue = byteBuffer.getShort();
 
 								// Adjust for correct position in bit stream
-								rawValue = (short) (rawValue >> (16-numbits-valstartbit));
-								rawValue = (short) (rawValue & (0xffff >> (16-numbits)));
+								rawValue = (byte) (rawValue >> (rawValueBitLength-numbits-valstartbit));
+								rawValue = (byte) (rawValue & baseMask);
+							}
+							else {
+
+								// Adapt value array access to align to array end
+								int readstartbyte;
+								int rawValueBitLength;
+								if (valstartbyte < valuesArray.length-4) {
+									readstartbyte = valstartbyte;
+									rawValueBitLength = 32;
+								}
+								else {
+									readstartbyte = valuesArray.length-4;
+									rawValueBitLength = 32 + ((valuesArray.length-4) - valstartbyte) * 8;
+								}
+
+								// Get data from values array
+								ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, readstartbyte, 4);
+								rawValue = byteBuffer.getInt();
+
+								// Adjust for correct position in bit stream
+								rawValue = (int) (rawValue >> (rawValueBitLength-numbits-valstartbit));
+								rawValue = (int) (rawValue & baseMask);
 							}
 
 							// Increase the index of the next value in the value array of Section 7
@@ -143,34 +167,59 @@ public class RandomAccessGribFile extends GribFile {
 						// Write value in the full grid data array
 						if (numbits <= 8) {
 
+							// Adapt target data array access to align to array end
+							int readstartbyte;
+							int rawValueBitLength;
+							if (targetstartbyte < decodedGridData.length-2) {
+								readstartbyte = targetstartbyte;
+								rawValueBitLength = 16;
+							}
+							else {
+								readstartbyte = decodedGridData.length-2;
+								rawValueBitLength = 16 + ((decodedGridData.length-2) - targetstartbyte) * 8;
+							}
+
 							// Create bit mask of length numbits shifted to have the alignment of
 							// the data in the bit stream
-							byte mask = (byte)(0xff >> (8-numbits));
-							mask = (byte)(mask << (8-numbits-targetstartbit));
-							
-							// Blend data into right position of the existing data stream 
-							ByteBuffer byteBuffer = ByteBuffer.wrap(decodedGridData, targetstartbyte, 1);
-							byte curData = byteBuffer.get();
-							byte data = (byte)(curData & (~mask));
-							data = (byte)(data | (rawValue  << (8-numbits-targetstartbit)));
+							short mask = (short)(baseMask << (rawValueBitLength-numbits-targetstartbit));
 
-							decodedGridData[targetstartbyte] = data;
+							// Blend data into right position of the existing data stream 
+							ByteBuffer byteBuffer = ByteBuffer.wrap(decodedGridData, readstartbyte, 2);
+							short curData = byteBuffer.getShort();
+							short data = (short)(curData & (~mask));
+							data = (short)(data | (rawValue  << (rawValueBitLength-numbits-targetstartbit)));
+
+							decodedGridData[readstartbyte] = (byte) ((data >> 8) & 0xFF);														
+							decodedGridData[readstartbyte+1] = (byte) (data & 0xFF);														
 						}
 						else {
 
+							// Adapt target data array access to align to array end
+							int readstartbyte;
+							int rawValueBitLength;
+							if (targetstartbyte < decodedGridData.length-4) {
+								readstartbyte = targetstartbyte;
+								rawValueBitLength = 32;
+							}
+							else {
+								readstartbyte = decodedGridData.length-4;
+								rawValueBitLength = 32 + ((decodedGridData.length-4) - targetstartbyte) * 8;
+							}
+
 							// Create bit mask of length numbits shifted to have the alignment of
 							// the data in the bit stream
-							short mask = (short)(0xffff >> (16-numbits));
-							mask = (short)(mask << (16-numbits-targetstartbit));
+							int mask = (int)(baseMask << (rawValueBitLength-numbits-targetstartbit));
 							
 							// Blend data into right position of the existing data stream 
-							ByteBuffer byteBuffer = ByteBuffer.wrap(decodedGridData, targetstartbyte, 2);
-							short curData = byteBuffer.getShort();
-							short data = (short)(curData & (~mask));
-							data = (short)(data | (rawValue  << (16-numbits-targetstartbit)));
+							ByteBuffer byteBuffer = ByteBuffer.wrap(decodedGridData, readstartbyte, 4);
+							int curData = byteBuffer.getInt();
+							int data = (int)(curData & (~mask));
+							data = (int)(data | (rawValue  << (rawValueBitLength-numbits-targetstartbit)));
 
-							decodedGridData[targetstartbyte] = (byte) (data >> 8);
-							decodedGridData[targetstartbyte+1] = (byte) (data & 0xFF);							
+							decodedGridData[readstartbyte] = (byte) (data >> 24);
+							decodedGridData[readstartbyte+1] = (byte) ((data >> 16) & 0xFF);														
+							decodedGridData[readstartbyte+2] = (byte) ((data >> 8) & 0xFF);														
+							decodedGridData[readstartbyte+3] = (byte) (data & 0xFF);														
 						}
 					}
 				}

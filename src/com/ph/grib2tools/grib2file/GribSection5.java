@@ -75,7 +75,8 @@ public class GribSection5 extends GribSection {
 		if (dataRepresentationTemplateNumber == 0) {
 
 			int numbits = ((DataRepresentationTemplate50)dataRepresentationTemplate).numberBits;
-	
+			int baseMask = (int)(Math.pow(2, numbits) - 1); 
+
 			// Position of the value in the array of values of Section 7
 			int sourcebitpos = sourcevaluecnt * numbits;
 	
@@ -86,27 +87,51 @@ public class GribSection5 extends GribSection {
 			// Retrieve value from value array
 			int raw;
 			if (numbits <= 8) {
-				
+
+				// Adapt value array access to align to array end
+				int readstartbyte;
+				int rawValueBitLength;
+				if (valstartbyte < valuesArray.length-2) {
+					readstartbyte = valstartbyte;
+					rawValueBitLength = 16;
+				}
+				else {
+					readstartbyte = valuesArray.length-2;
+					rawValueBitLength = 16 + ((valuesArray.length-2) - valstartbyte) * 8;
+				}
+
 				// Get data from values array
-				ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 1);
-				short rawValue = byteBuffer.get();
-	
-				// Adjust for correct position in bit stream
-				rawValue = (byte) (rawValue >> (8-numbits-valstartbit));
-				rawValue = (byte) (rawValue & (0xff >> (8-numbits)));
-				
-				raw = adjustUnsignedByte(rawValue);
-			}
-			else {
-				
-				// Get data from values array
-				ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, valstartbyte, 2);
+				ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, readstartbyte, 2);
 				short rawValue = byteBuffer.getShort();
 	
 				// Adjust for correct position in bit stream
-				rawValue = (short) (rawValue >> (16-numbits-valstartbit));
-				rawValue = (short) (rawValue & (0xffff >> (16-numbits)));
-				
+				rawValue = (short) (rawValue >> (rawValueBitLength-numbits-valstartbit));
+				rawValue = (short) (rawValue & baseMask);
+
+				raw = adjustUnsignedByte(rawValue);
+			}
+			else {
+
+				// Adapt value array access to align to array end
+				int readstartbyte;
+				int rawValueBitLength;
+				if (valstartbyte < valuesArray.length-4) {
+					readstartbyte = valstartbyte;
+					rawValueBitLength = 32;
+				}
+				else {
+					readstartbyte = valuesArray.length-4;
+					rawValueBitLength = 32 + ((valuesArray.length-4) - valstartbyte) * 8;
+				}
+
+				// Get data from values array				
+				ByteBuffer byteBuffer = ByteBuffer.wrap(valuesArray, readstartbyte, 4);
+				int rawValue = byteBuffer.getInt();
+	
+				// Adjust for correct position in bit stream
+				rawValue = (int) (rawValue >> (rawValueBitLength-numbits-valstartbit));
+				rawValue = (int) (rawValue & baseMask);
+
 				raw = adjustUnsignedShort(rawValue);
 			}
 			

@@ -27,6 +27,7 @@ public class GribSection7 extends GribSection {
 
 	public GribSection7(int len, byte num, byte[] data) {
 		super(len, num, data);
+		bitmapDecodedData = data;
 	}
 	
 	public GribSection7(InputStream gribfile) throws IOException {
