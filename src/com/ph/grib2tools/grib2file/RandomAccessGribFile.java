@@ -370,8 +370,8 @@ deltaj = 0;
 				int iidx2 = iidx1 + 1;
 
 				
-				//byte data[] = sec7.sectiondata;				
-				byte data[] = sec7.bitmapDecodedData;				
+				byte data[] = sec7.sectiondata;				
+// UNDO				byte data[] = sec7.bitmapDecodedData;				
 
 				// Extract data of the four grid points surrounding the passed coordinate and calculate the
 				// values represented by the data

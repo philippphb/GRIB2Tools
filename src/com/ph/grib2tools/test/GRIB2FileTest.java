@@ -59,11 +59,27 @@ public class GRIB2FileTest {
 			System.out.println("Covered area:");
 			System.out.println("   from (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.firstPointLat) + ", " + GribFile.unitsToDeg(gridDefinition.firstPointLon));		
 			System.out.println("   to: (latitude, longitude): " + GribFile.unitsToDeg(gridDefinition.lastPointLat) + ", " + GribFile.unitsToDeg(gridDefinition.lastPointLon));		
-
+/*
 			// Get grid data
-			double latitude = 52.52;
-			double longitude = 13.38;
+//			double latitude = 52.52;
+//			double longitude = 13.38;
+			double latitude = 40;
+			double longitude = 60;
 			System.out.println("Value at (" + latitude + ", " + longitude + "): " + gribFile.interpolateValueAtLocation(gridid, latitude, longitude));
+*/			
+			
+			double latStart = GribFile.unitsToDeg(gridDefinition.firstPointLat);
+			double lonStart = GribFile.unitsToDeg(gridDefinition.firstPointLon);		
+			double latEnd = GribFile.unitsToDeg(gridDefinition.lastPointLat);
+			double lonEnd = GribFile.unitsToDeg(gridDefinition.lastPointLon);		
+			double latStep = 0.1;
+			double lonStep = 0.1;
+			
+			for (double latitude=latStart; latitude>latEnd; latitude-=latStep) {
+				for (double longitude=lonStart; longitude>lonEnd; longitude-=lonStep) {
+					System.out.println("Value at (" + latitude + ", " + longitude + "): " + gribFile.interpolateValueAtLocation(gridid, latitude, longitude));
+				}
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
